@@ -26,7 +26,7 @@ on:
       - 'CONTRIBUTING.md'
 
 env:
-  BUILD_TYPE: Debug
+  BUILD_TYPE: Release
   TEST_TARGET: seekdb_tests
   SEEKDB_ARTIFACT: seekdb-binary
 
