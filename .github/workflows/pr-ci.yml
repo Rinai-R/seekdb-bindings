@@ -79,6 +79,7 @@ jobs:
         uses: actions/setup-go@v5
         with:
           go-version: stable
+          cache: false
 
       - name: Run gofmt check
         shell: bash
@@ -259,6 +260,7 @@ jobs:
         uses: actions/setup-go@v5
         with:
           go-version: '1.21.x'
+          cache-dependency-path: go/go.sum
 
       - name: Verify Go binding on minimum supported Go
         shell: bash
@@ -275,6 +277,7 @@ jobs:
         uses: actions/setup-go@v5
         with:
           go-version: stable
+          cache-dependency-path: go/go.sum
 
       - name: Verify Go binding on stable Go
         shell: bash
