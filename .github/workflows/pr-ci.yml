@@ -75,6 +75,22 @@ jobs:
           fi
           clang-format-14 --dry-run --Werror "${files[@]}"
 
+      - name: Setup Go
+        uses: actions/setup-go@v5
+        with:
+          go-version: stable
+
+      - name: Run gofmt check
+        shell: bash
+        run: |
+          set -euo pipefail
+          unformatted="$(gofmt -l go)"
+          if [ -n "$unformatted" ]; then
+            echo "Go files are not formatted:" >&2
+            echo "$unformatted" >&2
+            exit 1
+          fi
+
   prepare-seekdb:
     name: Prepare seekdb binary
     runs-on: ubuntu-22.04
@@ -238,6 +254,37 @@ jobs:
       - &build-driver
         name: Build seekdb
         run: cmake --build build --target seekdb --parallel
+
+      - name: Setup minimum supported Go
+        uses: actions/setup-go@v5
+        with:
+          go-version: '1.21.x'
+
+      - name: Verify Go binding on minimum supported Go
+        shell: bash
+        env:
+          CGO_LDFLAGS: -L${{ github.workspace }}/build -Wl,-rpath,${{ github.workspace }}/build
+          LD_LIBRARY_PATH: ${{ github.workspace }}/build
+        run: |
+          set -euo pipefail
+          cd go
+          go vet ./...
+          go test -v -timeout 10m ./...
+
+      - name: Setup stable Go
+        uses: actions/setup-go@v5
+        with:
+          go-version: stable
+
+      - name: Verify Go binding on stable Go
+        shell: bash
+        env:
+          CGO_LDFLAGS: -L${{ github.workspace }}/build -Wl,-rpath,${{ github.workspace }}/build
+          LD_LIBRARY_PATH: ${{ github.workspace }}/build
+        run: |
+          set -euo pipefail
+          cd go
+          go test -v -timeout 10m ./...
 
       - &build-python-binding
         name: Build Python binding
